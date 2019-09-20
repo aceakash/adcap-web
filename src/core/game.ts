@@ -104,6 +104,13 @@ export class Game {
             new Business('newsPapers', 'Newspaper Stall', 2 * 1000, 60, 60, 0.15, delayFn),
             new Business('carWash', 'Car Wash', 6 * 1000, 540, 720, 0.14, delayFn),
             new Business('pizzaDelivery', 'Pizza Delivery', 12 * 1000, 4320, 8640, 0.13, delayFn),
+            new Business('donutShop', 'Donut Shop', 18 * 1000, 51840, 103680, 0.12, delayFn),
+            new Business('shrimpBoat', 'Shrimp Boat', 96 * 1000, 622080, 1244160, 0.11, delayFn),
+            
+            new Business('hockeyTeam', 'Hockey Team', 384 * 1000, 7464000, 14929920, 0.1, delayFn),
+            new Business('movieStudio', 'Movie Studio', 1536 * 1000, 89579000, 179159040, 0.09, delayFn),
+            new Business('bank', 'Bank', 6144 * 1000, 1074000000, 2149908480, 0.08, delayFn),
+            // new Business('oilCompany', 'Oil Company', -1 * 1000, -9, 25798901760, 0.99, delayFn),
         ]
     }
 
