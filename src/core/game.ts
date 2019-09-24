@@ -1,90 +1,6 @@
-import {delay} from './util'
+import { delay } from './util'
 
-export class Business {
-    static calculateNextInstanceCost(currentInstanceCount: number, costOfFirstInstance: number, instanceInflationFactor: number) {
-        if (currentInstanceCount === 0) {
-            return costOfFirstInstance
-        }
-        return costOfFirstInstance * Math.pow((1 + instanceInflationFactor), currentInstanceCount)    
-    }
-
-    
-    
-    readonly id: string;
-    readonly name: string;
-    
-    private _instanceCount: number = 0;
-    get instanceCount(): number {
-        return this._instanceCount
-    }
-
-    private _saleTimeMs: number;
-    get saleTimeMs(): number {
-        return this._saleTimeMs
-    }
-
-    private _earningsPerInstanceSale$: number;
-    get earningsPerSale$(): number {
-        return this._earningsPerInstanceSale$ * this._instanceCount
-    }
-
-    private _isSaleInProgress: boolean;
-    get isSaleInProgress(): boolean {
-        return this._isSaleInProgress
-    }
-
-    private _costOfFirstInstance$: number;
-    get costOfFirstInstance$(): number {
-        return this._costOfFirstInstance$
-    }
-
-    
-    private _instanceInflationFactor: number;
-    /**  instanceInflationFactor is how much the next instance is more expensive by. 
-     e.g. if the first instance costs 100, and the instanceInflationFactor is 0.10, 
-     then the second instance will cost 100 * (1 + 0.10) = 110, 
-     and the third will cost 121
-    */
-    get instanceInflationFactor(): number {
-        return this._instanceInflationFactor
-    }
-
-    private readonly _delay: (delayMs: number)=>Promise<any>;
-
-    constructor(id: string, name: string, saleTimeMs: number, earningsPerInstanceSale$: number, costOfFirstInstance$: number, instanceInflationFactor: number, delayFn: (delayMs: number)=>Promise<any>) {
-        this.id = id
-        this.name = name
-        this._saleTimeMs = saleTimeMs
-        this._earningsPerInstanceSale$ = earningsPerInstanceSale$
-        this._isSaleInProgress = false
-        this._costOfFirstInstance$ = costOfFirstInstance$
-        this._instanceInflationFactor = instanceInflationFactor
-        this._delay = delayFn
-    }
-
-    async manualSale(): Promise<number> {
-        if (this._instanceCount === 0) {
-            throw new Error("No instances of this business yet")
-        }
-        if (this._isSaleInProgress) {
-            throw new Error("A sale is already in progress")
-        }
-        this._isSaleInProgress = true
-        await this._delay(this._saleTimeMs)
-        this._isSaleInProgress = false
-        return this.earningsPerSale$
-    }
-
-    buyNewInstance() {
-        this._instanceCount += 1
-    }
-    
-    calculateCostOfNextInstance(): number {
-        return Business.calculateNextInstanceCost(this._instanceCount, this._costOfFirstInstance$, this._instanceInflationFactor)
-    }
-}
-
-
+import { Business } from './business'
 
 
 
@@ -94,39 +10,30 @@ export class Game {
         return this._funds$
     }
 
-    readonly businesses: Business[];
+    readonly businesses: Map<string, Business>
 
 
-    constructor(delayFn: (delayMs: number)=>Promise<any> = delay) {
+    constructor(delayFn: (delayMs: number) => Promise<any> = delay) {
         this._funds$ = 4
-        this.businesses = [
-            new Business('lemonadeStand', 'Lemonade Stand', 1000, 1, 4, 0.07, delayFn),
-            new Business('newsPapers', 'Newspaper Stall', 2 * 1000, 60, 60, 0.15, delayFn),
-            new Business('carWash', 'Car Wash', 6 * 1000, 540, 720, 0.14, delayFn),
-            new Business('pizzaDelivery', 'Pizza Delivery', 12 * 1000, 4320, 8640, 0.13, delayFn),
-            new Business('donutShop', 'Donut Shop', 18 * 1000, 51840, 103680, 0.12, delayFn),
-            new Business('shrimpBoat', 'Shrimp Boat', 96 * 1000, 622080, 1244160, 0.11, delayFn),
-            
-            new Business('hockeyTeam', 'Hockey Team', 384 * 1000, 7464000, 14929920, 0.1, delayFn),
-            new Business('movieStudio', 'Movie Studio', 1536 * 1000, 89579000, 179159040, 0.09, delayFn),
-            new Business('bank', 'Bank', 6144 * 1000, 1074000000, 2149908480, 0.08, delayFn),
-            // new Business('oilCompany', 'Oil Company', -1 * 1000, -9, 25798901760, 0.99, delayFn),
-        ]
+        this.businesses = new Map<string, Business>()
+
+        this.businesses.set('lemonadeStand', new Business('lemonadeStand', 'Lemonade Stand', 1000, 1, 4, 0.07, 1000, delayFn))
+        this.businesses.set('newsPapers', new Business('newsPapers', 'Newspaper Stall', 2 * 1000, 60, 60, 0.15, 15000, delayFn))
+        this.businesses.set('carWash', new Business('carWash', 'Car Wash', 6 * 1000, 540, 720, 0.14, 100000, delayFn))
+        this.businesses.set('pizzaDelivery', new Business('pizzaDelivery', 'Pizza Delivery', 12 * 1000, 4320, 8640, 0.13, 500000, delayFn))
+        this.businesses.set('donutShop', new Business('donutShop', 'Donut Shop', 18 * 1000, 51840, 103680, 0.12, 1200000, delayFn))
+        this.businesses.set('shrimpBoat', new Business('shrimpBoat', 'Shrimp Boat', 96 * 1000, 622080, 1244160, 0.11, 10*1000*1000, delayFn))
+        this.businesses.set('hockeyTeam', new Business('hockeyTeam', 'Hockey Team', 384 * 1000, 7464000, 14929920, 0.1, 111111111, delayFn))
+        this.businesses.set('movieStudio', new Business('movieStudio', 'Movie Studio', 1536 * 1000, 89579000, 179159040, 0.09, 555555555, delayFn))
+        this.businesses.set('bank', new Business('bank', 'Bank', 6144 * 1000, 1074000000, 2149908480, 0.08, 10*1000*1000*1000, delayFn))
     }
 
-    /*
-    car wash   starts at 720, 820.80, 
-    earns 540
-    */
 
     /**
      * Executes a manual sale (e.g. when user clicks) 
      */
-    async manualSale(businessId: string): Promise<any>  {
-        let business = this.businesses.find(b => b.id === businessId)
-        if (business === undefined) {
-            throw new Error(`Unknown businessId ${businessId}`)
-        }
+    async manualSale(businessId: string): Promise<any> {
+        let business = this.getBusinessWithId(businessId)
         const earnings$ = await business.manualSale()
         this._funds$ += earnings$
         return
@@ -138,7 +45,7 @@ export class Game {
     }
 
     getBusinessWithId(businessId: string): Business {
-        let business = this.businesses.find(b => b.id === businessId)
+        let business = this.businesses.get(businessId)
         if (business === undefined) {
             throw new Error(`Unknown businessId ${businessId}`)
         }
@@ -150,17 +57,22 @@ export class Game {
         if (!this.canAffordNewInstance(businessId)) {
             throw new Error(`Not enough funds to buy next instance of ${businessId}`)
         }
-        const costOfNextInstance$ = business.calculateCostOfNextInstance()
-        
-        if (this._funds$ < costOfNextInstance$) {
-            
-        }
-        this._funds$ -= costOfNextInstance$
+        this._funds$ -= business.calculateCostOfNextInstance()
         business.buyNewInstance()
     }
+
+    hireManager(businessId: string): void {
+        let business = this.getBusinessWithId(businessId)
+        if (this._funds$ < business.managerCost) {
+            throw new Error(`Not enough funds to hire manager for ${businessId}`)
+        }
+        this._funds$ -= business.managerCost
+        business.managerHired = true
+        const that = this
+        setInterval(() => {
+            if (!business.isSaleInProgress) {
+                that.manualSale(businessId)
+            }
+        }, 500)
+    }
 }
-
-
-
-
-

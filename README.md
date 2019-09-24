@@ -1,3 +1,18 @@
+## Tasks
+
+[ ] When a sale is in progress, indicate a countdown to when it will be finished.
+
+[ ] Implement managers
+
+[ ] Implement upgrades
+
+[ ] Format numbers so they're human-friendly
+
+[ ] Think about the layout
+
+[ ] Make the data persistent (localStorage?)
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
