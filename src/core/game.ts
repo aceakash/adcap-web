@@ -70,7 +70,7 @@ export class Game {
         business.managerHired = true
         const that = this
         setInterval(() => {
-            if (!business.isSaleInProgress) {
+            if (business.saleStartedTime == null) {
                 that.manualSale(businessId)
             }
         }, 500)

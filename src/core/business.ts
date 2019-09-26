@@ -14,6 +14,11 @@ export class Business {
         return this._instanceCount
     }
 
+    private _saleStartedTime: number | null
+    get saleStartedTime(): number | null {
+        return this._saleStartedTime
+    }
+
     private _saleTimeMs: number;
     get saleTimeMs(): number {
         return this._saleTimeMs
@@ -24,10 +29,10 @@ export class Business {
         return this._earningsPerInstanceSale$ * this._instanceCount
     }
 
-    private _isSaleInProgress: boolean;
-    get isSaleInProgress(): boolean {
-        return this._isSaleInProgress
-    }
+    // private _isSaleInProgress: boolean;
+    // get isSaleInProgress(): boolean {
+    //     return this._isSaleInProgress
+    // }
 
     private _costOfFirstInstance$: number;
     get costOfFirstInstance$(): number {
@@ -64,7 +69,8 @@ export class Business {
         this.name = name
         this._saleTimeMs = saleTimeMs
         this._earningsPerInstanceSale$ = earningsPerInstanceSale$
-        this._isSaleInProgress = false
+        // this._isSaleInProgress = false
+        this._saleStartedTime = null
         this._costOfFirstInstance$ = costOfFirstInstance$
         this._instanceInflationFactor = instanceInflationFactor
         this._delay = delayFn
@@ -75,12 +81,12 @@ export class Business {
         if (this._instanceCount === 0) {
             throw new Error("No instances of this business yet")
         }
-        if (this._isSaleInProgress) {
+        if (this.saleStartedTime !== null) {
             throw new Error("A sale is already in progress")
         }
-        this._isSaleInProgress = true
+        this._saleStartedTime = new Date().getTime()
         await this._delay(this._saleTimeMs)
-        this._isSaleInProgress = false
+        this._saleStartedTime = null
         return this.earningsPerSale$
     }
 
